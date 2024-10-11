@@ -1,0 +1,30 @@
+<!-- HTML -->
+
+<canvas id="confetti-canvas"></canvas>
+
+<!-- JS -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
+<script type="text/javascript">
+  const canvas = document.querySelector('#confetti-canvas');
+  var myConfetti = confetti.create(canvas, {
+
+    });
+    myConfetti({
+      particleCount: 3000,
+      spread: 300
+    });
+  
+
+</script>
+
+<!-- CSS -->
+<style>
+#confetti-canvas {
+  position: fixed; 
+  z-index: 999; 
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  pointer-events: none;
+}
+</style>

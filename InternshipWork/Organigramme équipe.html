@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+
+<head>
+
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>DataList</title>
+  <!-- Importation de JQuery et de SPServices -->
+<script type="text/javascript" src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+  <script type="text/javascript" src="https://inshare.grp.collab.group.safran/com/DQ_9/cei-pc/SiteAssets/jquery.SPServices.min.js"></script>
+
+  <script>
+
+    $(document).ready(function() {
+      // Quelques lignes pour vérifier si les bibliothèques ont bien été importé
+     // alert("jQuery");
+      //alert($().SPServices.SPGetCurrentSite());
+      console.log("Hello world");
+
+// Définit les paramètres pour la fonction GetListItems
+
+      var listName = "Liste_Organigramme";
+      var viewName = "";
+      var CAMLQuery = "<Query><OrderBy><FieldRef Name='Nom' /></OrderBy></Query>";
+      // C'est ici que tu mets le nom de tes colonnes
+
+      var CAMLViewFields = "<ViewFields>"
+                  + "<FieldRef Name='Nom' />"
+                  + "<FieldRef Name='Prenom' />"
+                  + "<FieldRef Name='Nom_de_poste' />"
+                  + "<FieldRef Name='Type_de_personne' />"
+                  + "<FieldRef Name='URL_photo' />"
+                  + "<FieldRef Name='URL_Personne' />"
+                  + "<FieldRef Name='Fournisseurs' />"
+                + "</ViewFields>";
+      var CAMLRowLimit = 0;
+
+
+      // Appelle la fonction GetListItems pour récupérer les éléments de la liste SharePoint
+
+      $().SPServices({
+        operation: "GetListItems",
+        listName: listName,
+        viewName: viewName,
+        CAMLQuery: CAMLQuery,
+        CAMLViewFields: CAMLViewFields,
+        CAMLRowLimit: CAMLRowLimit,
+        completefunc: function(xData, Status) {
+
+
+          // Traite les données récupérées et les insère dans le tableau HTML
+          //var table = $("#grid-container");
+          $(xData.responseXML).SPFilterNode("z:row").each(function() {
+            var table = $("#item1");
+            var Nom = $(this).attr("ows_Nom");
+            var Prenom = $(this).attr("ows_Prenom");
+            var Nom_de_poste = $(this).attr("ows_Nom_de_poste");
+            var Type_de_personne = $(this).attr("ows_Type_de_personne");
+            var URL_photo = $(this).attr("ows_URL_photo");
+            var URL_Personne = $(this).attr("ows_URL_Personne");
+            var Fournisseurs = $(this).attr("ows_Fournisseurs");
+ 
+
+            let type = "";
+            if (Type_de_personne === "Chef"){
+                  
+                  var row =  "<a href=" + URL_Personne +">  <div class = 'bloc1' onclick='location.href=" + URL_Personne + ";' style='cursor:pointer;'>"
+                    + "<img src=" + URL_photo + ">"
+                    +"<p3>"+ Nom +" " + Prenom + "</p3><br>"
+                    + "<p4>" + Nom_de_poste + "<p4>"
+            + "</div> </a>"
+            } else  {
+
+
+            }
+
+            // Ici on écrit du html sous forme de chaine de caractère avec les variables qui
+            // correspondent aux données de la liste SharePoint
+
+            table.append(row);
+          });
+        
+
+
+          $(xData.responseXML).SPFilterNode("z:row").each(function() {
+            var table = $("#item2");
+            var Nom = $(this).attr("ows_Nom");
+            var Prenom = $(this).attr("ows_Prenom");
+            var Nom_de_poste = $(this).attr("ows_Nom_de_poste");
+            var Type_de_personne = $(this).attr("ows_Type_de_personne");
+            var URL_photo = $(this).attr("ows_URL_photo");
+            var URL_Personne = $(this).attr("ows_URL_Personne");
+            var Fournisseurs = $(this).attr("ows_Fournisseurs");
+
+            let type = "";
+            if (Type_de_personne === "Chef"){
+
+            } else  {
+
+                    
+                    var row =  "<a href=" + URL_Personne +"> <div class = 'bloc' onclick='location.href=" + URL_Personne + ";' style='cursor:pointer;'>"
+                    +   "<div class='content'>"
+                    +    "<div class='text'>" + Fournisseurs + "</div>"
+                    +     "</div>"
+                    + "<img src=" + URL_photo + ">"
+                    +"<p>"+ Nom +" " + Prenom + "</p>"
+                    + "<p2>" + Nom_de_poste + "<p2>"
+                    + "</div> </a>" 
+
+            }
+
+            // Ici on écrit du html sous forme de chaine de caractère avec les variables qui
+            // correspondent aux données de la liste SharePoint
+
+            table.append(row);
+          });
+
+          
+        }
+      });
+    });
+  </script>
+
+<style>
+
+
+.grid-container {
+      display: grid;
+      grid-template-areas: 
+        'colonne1 colonne2';
+      grid-template-columns: 1fr 1fr;
+      grid-template-rows: auto;
+      justify-items: center;
+      align-items: center;
+    }
+    
+.item1 {
+      grid-area: colonne1;
+      display : flex;
+      flex-flow : row wrap;
+    }
+    
+.item2 {
+      grid-area: colonne2;
+      border-left: 3px solid black;
+      padding-left: 10%;
+      display : flex;
+      flex-flow : row wrap;
+      gap: 1em 2em;
+      justify-content: center;
+    }
+    
+    
+
+    .bloc {
+    text-align : center;
+	border-radius: 30px;
+    width : 150px;
+    padding: 1%;
+    transition: all ease 1s;
+
+      }
+
+      .bloc1 {
+    text-align : center;
+	border-radius: 30px;
+    width : 300px;
+    padding: 1%;
+    transition: all ease 1s;
+
+
+ 
+      }
+      .bloc img {
+     width: auto;
+     height: 110px;
+border-radius: 30px;
+}
+
+.bloc1 img {
+width : 300px;
+height : auto;
+border-radius : 30px;
+}
+
+        
+.bloc1:hover {
+       transform: scale(1.1); 
+    }
+    
+     
+.bloc:hover {
+       transform: scale(1.1); 
+    }
+    
+    
+    
+p   {
+    font-size :15px;
+    color : orange;
+    font-weight: bold;
+text-decoration :none;
+    }
+    
+p2  {
+    font-size :8px ;
+    font-weight: bold;
+    vertical-align: super;
+text-decoration :none;
+    }
+    
+    
+p3 {
+    font-size :30px;
+    color : orange;
+    font-weight: bold;
+text-decoration :none;
+    }
+    
+p4 {
+    font-size :20px ;
+    font-weight: bold;
+    vertical-align: super;
+text-decoration :none;
+    }
+    
+    .content {
+        opacity: 0;
+        font-size: 15px;
+        position: absolute;
+        top: 0;
+        left: 0;
+        color: black;
+        background-color: rgba(200, 200, 200, 0.226);
+        width: 150px;
+height :180px;
+        -webkit-transition: all 400ms ease-out;
+        -moz-transition: all 400ms ease-out;
+        -o-transition: all 400ms ease-out;
+        -ms-transition: all 400ms ease-out;
+        transition: all 400ms ease-out;
+        text-align: center;
+      }
+
+      .bloc .content:hover {
+        opacity: 1;
+      }
+      .bloc .content .text {
+        height: 0;
+        opacity: 1;
+        transition-delay: 0s;
+        transition-duration: 0.4s;
+      }
+      .bloc .content:hover .text {
+        opacity: 1;
+        transform: translateY(50px);
+        -webkit-transform: translateY(50px);
+      }  
+     
+    </style>
+
+
+</head>
+
+<body>
+  <!-- Cette div contiendra les données de chaque ligne de la liste SharePoint-->
+  <div class="grid-container" id="grid-container">
+    <div class="item1" id="item1"> 
+
+    </div>
+       <div class="item2" id="item2"> 
+
+       </div>
+  </div>
+</body>
+</html>
