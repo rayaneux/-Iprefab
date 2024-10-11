@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Form with Column Management</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .field-container {
+            margin-bottom: 10px;
+        }
+        .field-label {
+            margin-right: 10px;
+        }
+        .remove-field {
+            cursor: pointer;
+            color: red;
+            margin-left: 10px;
+        }
+
+        form {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    max-width: 500px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+#fieldsContainer {
+    margin-bottom: 15px;
+}
+
+input[type="text"],
+select {
+    width: calc(100% - 20px);
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+input[type="text"]:focus,
+select:focus {
+    border-color: #4CAF50;
+}
+
+button {
+    display: inline-block;
+    background-color: #4CAF50;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 10px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+
+table {
+    width: 100%;
+    margin-top: 20px;
+    border-collapse: collapse;
+    background-color: #fff;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+}
+
+thead {
+    background-color: #4CAF50;
+    color: white;
+}
+
+tbody tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tbody tr:hover {
+    background-color: #e6f7e6;
+}
+    </style>
+</head>
+
+<body>
+
+    <h1>Custom Build Form</h1>
+
+    <form id="dynamicForm">
+        <div id="fieldsContainer"></div>
+        <button type="button" id="addTextField">Add Text Field</button>
+        <button type="button" id="addSelectField">Add Select Field</button>
+        <button type="submit">Save Data</button>
+    </form>
+
+    <h2>Submitted Data</h2>
+    <table id="dataTable">
+        <thead>
+            <tr id="tableHeaders"></tr>
+        </thead>
+        <tbody id="tableBody">
+            <!-- Rows of data will be added here -->
+        </tbody>
+    </table>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            let fieldCount = 0;
+            let headers = [];
+            let columnMap = {};
+    
+            // Function to add a text field
+            $('#addTextField').on('click', function() {
+                fieldCount++;
+                $('#fieldsContainer').append(`
+                    <div class="field-container" id="field-${fieldCount}">
+                        <label class="field-label">Column Name:</label>
+                        <input type="text" name="columnName-${fieldCount}" class="column-name" placeholder="Column Name" required>
+                        <br><label class="field-label">Text Field:</label>
+                        <input type="text" name="field-${fieldCount}" data-type="text" placeholder="Enter text" required>
+                        <span class="remove-field" data-id="${fieldCount}">Remove</span>
+                    </div>
+                `);
+            });
+    
+            // Function to add a select field
+            $('#addSelectField').on('click', function() {
+                fieldCount++;
+                $('#fieldsContainer').append(`
+                    <div class="field-container" id="field-${fieldCount}">
+                        <label class="field-label">Column Name:</label>
+                        <input type="text" name="columnName-${fieldCount}" class="column-name" placeholder="Column Name" required>
+                        <br><label class="field-label">Select Field:</label>
+                        <select name="field-${fieldCount}" data-type="select" required>
+                            <option value="Option 1">Option 1</option>
+                            <option value="Option 2">Option 2</option>
+                            <option value="Option 3">Option 3</option>
+                        </select>
+                        <span class="remove-field" data-id="${fieldCount}">Remove</span>
+                    </div>
+                `);
+            });
+    
+            // Remove a field 
+            $('#fieldsContainer').on('click', '.remove-field', function() {
+                const fieldId = $(this).data('id');
+                $(`#field-${fieldId}`).remove();
+            });
+    
+            // Handle form submission
+            $('#dynamicForm').on('submit', function(event) {
+                event.preventDefault();
+    
+                const rowData = [];
+    
+                // Iterate through each field container to collect data
+                $('#fieldsContainer .field-container').each(function() {
+                    const columnNameInput = $(this).find('input[name^="columnName"]');
+                    const columnName = columnNameInput.val().trim();
+                    const input = $(this).find('[name^="field"]');
+                    const value = input.val();
+    
+                    // If the column name is new, add it to the headers and the map
+                    if (columnName) {
+                        if (!headers.includes(columnName)) {
+                            headers.push(columnName);
+                            columnMap[columnName] = headers.length - 1; // Map column name to its index
+                            $('#tableHeaders').append(`<th>${columnName}</th>`);
+                        }
+                    }
+    
+                    // Push the value to the correct index in the rowData array
+                    if (columnName) {
+                        const index = columnMap[columnName]; // Get the index from the map
+                        rowData[index] = value; // Place the value in the correct index
+                    }
+
+
+                });
+    
+                // Add the data row to the table
+                const newRow = $('<tr></tr>');
+    
+                // Ensure the row data matches the headers
+                headers.forEach((header, index) => {
+                    newRow.append(`<td>${rowData[index] || ''}</td>`); // Add empty cell if no data
+                });
+    
+                $('#tableBody').append(newRow);
+    
+                // Reset the input fields (not the column names)
+                $('#dynamicForm')[0].reset();
+
+
+            });
+        });
+    </script>
+    
+</body>
+</html>
